@@ -1,31 +1,284 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "project#1", "project#1\project#1.vcxproj", "{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Debug|x64.ActiveCfg = Debug|x64
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Debug|x64.Build.0 = Debug|x64
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Debug|x86.ActiveCfg = Debug|Win32
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Debug|x86.Build.0 = Debug|Win32
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Release|x64.ActiveCfg = Release|x64
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Release|x64.Build.0 = Release|x64
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Release|x86.ActiveCfg = Release|Win32
-		{3E70BB39-CA5A-4547-97C8-B3859AEB9AB7}.Release|x86.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {E9A84364-B40C-41D9-962E-43A56F12CB45}
-	EndGlobalSection
-EndGlobal
+
+#include <iostream>
+#include<cstdlib>
+#include<cmath>
+#include<ctime>
+
+using namespace std;
+
+enum enQuizzLevel{Easy=1,Mid=2,Hard=3,MixLevel=4};
+
+enum enQuizzOpType { Add = 1 , Sub=2 , Mul=3 , Div=4 , MixOpType=5 };
+
+struct stQuizzInfo {
+
+    
+    int TotalQuestionNumber;
+    enQuizzLevel QuizzLevel;
+    enQuizzOpType OpType;
+    string OpTypeSymbole;
+    short number1;
+    short number2;
+    int PlayerResult;
+    int TheRightResult;
+
+};
+
+struct stFinalResults {
+
+   
+    short NumberOfRightAnswer;
+    short NumberOfWrongAnser;
+    
+};
+
+short ReadHowManyQuestion() {
+    short number;
+    do {
+        cout << "How Many Question do you Want To Answer ??\n";
+        cin >> number;
+    } while (number < 0);
+    return number;
+}
+enQuizzLevel EntreQuizzLevel() {
+    
+    short number;
+    do {
+        cout << "Entre Question Level [1] Easy, [2] Mid, [3] Hard, [4] Mix ?? ";
+        cin >> number;
+    } while (number < 0 || number>4);
+
+    return (enQuizzLevel)number;
+
+}
+enQuizzOpType EntreOpType() {
+    
+    short number;
+    do {
+        cout << "Entre Operation Type [1] Add, [2] Sub, [3] Mul, [4] Div, [5] Mix ?? ";
+        cin >> number;
+    } while (number < 0 || number>5);
+
+    return (enQuizzOpType)number;
+}
+
+int ReadPlayerResult() {
+    int number;
+    cin >> number;
+    
+    return number;
+}
+
+
+int RandomNumber(int From, int To) {
+    int RandNum = rand() % (To - From + 1) + From;
+    return RandNum;
+}
+
+enQuizzLevel MixChoice() {
+        return (enQuizzLevel)RandomNumber(1, 3);
+    
+}
+
+int NumberChoice(enQuizzLevel QuizzLevel) {
+
+    switch (QuizzLevel) {
+    case enQuizzLevel::Easy:
+        return RandomNumber(1, 10);
+        break;
+    case enQuizzLevel::Mid:
+        return RandomNumber(10, 50);
+        break;
+    case enQuizzLevel::Hard:
+        return RandomNumber(50, 100);
+        break;
+    case enQuizzLevel::MixLevel:
+        return NumberChoice(MixChoice());
+        break;
+    default:
+        break;
+    }
+}
+
+enQuizzOpType MixOpTypeChoice() {
+
+    return (enQuizzOpType)RandomNumber(1, 4);
+    
+}
+int OpTypeCalcule(int number1, int number2, enQuizzOpType OpType) {
+    
+    
+    
+    switch (OpType) {
+
+    case enQuizzOpType::Add:
+        return number1 + number2;
+        break;
+    case enQuizzOpType::Sub:
+        return number1 - number2;
+        break;
+    case enQuizzOpType::Mul:
+        return number1 * number2;
+        break;
+    case enQuizzOpType::Div:
+        return (number2!=0)? number1 / number2:0;
+        break;
+    case enQuizzOpType::MixOpType:
+        return OpTypeCalcule(number1,number2,MixOpTypeChoice());
+        break;
+    default:
+        break;
+    }
+}
+
+
+string ChooseOpTypeSymbole(enQuizzOpType QuizzOpType) {
+    
+
+    switch (QuizzOpType) {
+    case enQuizzOpType::Add:
+        return "+";
+        break;
+    case enQuizzOpType::Sub:
+        return "-";
+        break;
+    case enQuizzOpType::Mul:
+        return "*";
+        break;
+    case enQuizzOpType::Div:
+        return "/" ;
+        break;
+    case enQuizzOpType::MixOpType:
+        return ChooseOpTypeSymbole(MixOpTypeChoice());
+        break;
+    default:
+        break;
+    }
+}
+stQuizzInfo FillQuizzInfo(stQuizzInfo QuizzInfo) {
+
+    
+    QuizzInfo.number1 = NumberChoice(QuizzInfo.QuizzLevel);
+    QuizzInfo.number2 = NumberChoice(QuizzInfo.QuizzLevel);
+    
+    QuizzInfo.OpTypeSymbole = ChooseOpTypeSymbole(QuizzInfo.OpType);
+    
+    QuizzInfo.TheRightResult = OpTypeCalcule(QuizzInfo.number1, QuizzInfo.number2,QuizzInfo.OpType);
+    
+    return QuizzInfo;
+}
+ void ColorScreen(stQuizzInfo QuizzInfo) {
+    if (QuizzInfo.PlayerResult == QuizzInfo.TheRightResult) {
+        system("color 27");
+    }
+    else if (QuizzInfo.PlayerResult != QuizzInfo.TheRightResult) {
+        system("color 47");
+    }
+}
+
+void PrintQuizz(stFinalResults &FinalResults, stQuizzInfo QuizzInfo) {
+
+    
+    short NumberOfRightAwnsers = 0;
+    short NumberOfWrongAwnsers = 0;
+   
+    
+
+    for (short QuestionNumber = 1; QuestionNumber <= QuizzInfo.TotalQuestionNumber; QuestionNumber++) {
+    
+        QuizzInfo = FillQuizzInfo(QuizzInfo);
+        
+        cout << "\nQuestion [" << QuestionNumber << "/" << QuizzInfo.TotalQuestionNumber << "]\n";
+        cout << QuizzInfo.number1 << "\n";
+        cout << QuizzInfo.number2 << " " << QuizzInfo.OpTypeSymbole << "\n";
+        cout << "------------------\n";
+        cin >> QuizzInfo.PlayerResult;
+        
+        if (QuizzInfo.PlayerResult == QuizzInfo.TheRightResult) {
+            ColorScreen(QuizzInfo);
+            cout << "\nRight Answer :-)\n";
+            NumberOfRightAwnsers++;
+        }
+        else if (QuizzInfo.PlayerResult != QuizzInfo.TheRightResult){
+            ColorScreen(QuizzInfo);
+            cout << "\nWrong Answer :-(\n";
+            cout << "The Right awnser is : " << QuizzInfo.TheRightResult;
+            NumberOfWrongAwnsers++;
+        }
+
+        FinalResults.NumberOfRightAnswer = NumberOfRightAwnsers;
+        FinalResults.NumberOfWrongAnser = NumberOfWrongAwnsers;
+    }
+}
+void ClearScreen() {
+    system("color 07");
+    system("cls");
+}
+
+void TheFinalResults(stFinalResults FinalResults) {
+    if (FinalResults.NumberOfRightAnswer >= FinalResults.NumberOfWrongAnser) {
+        cout << "Pass\n";
+    }
+    else {
+        cout << "Fail\n";
+    }
+}
+string NameQuizzLevel(enQuizzLevel QuizzLevel) {
+    string arrQuizzLevel[4] = { "Easy","Mid","Hard","Mix" };
+    return arrQuizzLevel[QuizzLevel - 1];
+}
+string NameOpType(enQuizzOpType OpType) {
+    string arrQuizzLevel[5] = { "Add","Sub","Mul","Div","Mix"};
+    return arrQuizzLevel[OpType - 1];
+}
+void PrintFinalResults(stFinalResults FinalResults, stQuizzInfo QuizzInfo) {
+   
+    
+
+    cout << "\n\n__________________________________\n";
+    cout << "The Final Result is : ";
+    TheFinalResults(FinalResults);
+    cout << "\n\n__________________________________\n";
+    cout << "\nThe Number Of Questions : " << QuizzInfo.TotalQuestionNumber;
+    cout << "\nQuestionLevel : " << NameQuizzLevel(QuizzInfo.QuizzLevel);
+    cout << "\nOpType : " << NameOpType(QuizzInfo.OpType);
+    cout << "\nThe Number Of Right Awnser : "<<FinalResults.NumberOfRightAnswer;
+    cout << "\nThe Number Of wrong Awnser : "<<FinalResults.NumberOfWrongAnser;
+    cout << "\n__________________________________\n";
+
+}
+void StartQuizz(){
+    
+    stFinalResults FinalResults;
+    stQuizzInfo QuizzInfo;
+
+    string QuizzAgain = "";
+
+    do {
+        //ClearScreen();
+
+        FinalResults.NumberOfRightAnswer = 0;
+        FinalResults.NumberOfWrongAnser = 0;
+
+        QuizzInfo.TotalQuestionNumber = ReadHowManyQuestion();
+        QuizzInfo.QuizzLevel = EntreQuizzLevel();
+        QuizzInfo.OpType = EntreOpType();
+
+        
+        
+        PrintQuizz(FinalResults,QuizzInfo);
+        PrintFinalResults(FinalResults,QuizzInfo);
+
+        cout << "\nDo You Want To Play Again Y/N ?? \n";
+        cin >> QuizzAgain;
+
+    } while (QuizzAgain == "Y" || QuizzAgain == "y");
+
+    
+}
+int main()
+{
+    srand((unsigned)time(NULL));
+
+    StartQuizz();
+}
